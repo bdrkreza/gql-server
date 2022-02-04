@@ -1,4 +1,4 @@
-const { GraphQLString } = require("graphql");
+const { GraphQLString, GraphQLID } = require("graphql");
 const { User, Post } = require("../models");
 const { auth } = require("../utils");
 const { postType } = require("./types");
@@ -91,4 +91,26 @@ const createPost = {
   }
 };
 
-module.exports = { register, login, createPost };
+const updatePost = {
+  type: postType,
+  description: "update a Post",
+  args: {
+    id: { type: GraphQLID },
+    title: { type: GraphQLString },
+    body: { type: GraphQLString }
+  },
+  resolve: async (_, { id, title, body }, { user }) => {
+    try {
+      const updatedPost = await Post.findByIdAndUpdate(
+        { _id: id, authorId: user.id },
+        { title, body },
+        { new: true, runValidators: true }
+      );
+      return updatedPost;
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+
+module.exports = { register, login, createPost, updatePost };

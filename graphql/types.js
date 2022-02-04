@@ -5,7 +5,7 @@ const userType = new GraphQLObjectType({
   name: "userType",
   description: "the get user type",
   fields: {
-    id: { type: GraphQLID },
+    _id: { type: GraphQLID },
     username: { type: GraphQLString },
     email: { type: GraphQLString },
     password: { type: GraphQLString },
@@ -18,7 +18,7 @@ const postType = new GraphQLObjectType({
   name: "postType",
   description: "the create post type",
   fields: {
-    id: { type: GraphQLID },
+    _id: { type: GraphQLID },
     authorId: { type: GraphQLID },
     title: { type: GraphQLString },
     body: { type: GraphQLString },

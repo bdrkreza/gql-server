@@ -14,7 +14,7 @@ const getUser = {
   args: {
     id: { type: GraphQLID }
   },
-  resolve: async (_, { id }) => await User.find({ _id: id })
+  resolve: async (_, { id }) => await User.findById({ _id: id })
 };
 
 const getAllPost = {
