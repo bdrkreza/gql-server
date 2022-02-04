@@ -7,4 +7,4 @@ const createJWTToken = (user) => {
   });
 };
 
-module.exports = createJWTToken;
+module.exports = { createJWTToken };
