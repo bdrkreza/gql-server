@@ -89,6 +89,7 @@ const createPost = {
   },
   resolve: async (_, { title, body }, { user }) => {
     try {
+      if (!user || !user.role.includes("admin")) return null;
       const newPost = new Post({
         title,
         body,
@@ -115,6 +116,7 @@ const updatePost = {
   },
   resolve: async (_, { id, title, body }, { user }) => {
     try {
+      if (!user || !user.role.includes("admin")) return null;
       const updatedPost = await Post.findByIdAndUpdate(
         { _id: id, authorId: user.id },
         { title, body },
@@ -139,6 +141,7 @@ const deletePost = {
   },
   resolve: async (_, { id }, { user }) => {
     try {
+      if (!user || !user.role.includes("admin")) return null;
       const post = await Post.findById({ _id: id });
 
       if (post) {
@@ -162,6 +165,7 @@ const addComment = {
   },
   resolve: async (_, { postId, comment }, { user }) => {
     try {
+      if (!user || !user.role.includes("user")) return null;
       const newComment = new Comment({
         postId,
         comment,
@@ -183,6 +187,7 @@ const updateComment = {
   },
   resolve: async (_, { id, comment }, { user }) => {
     try {
+      if (!user || !user.role.includes("admin")) return null;
       const updatedComment = await Comment.findByIdAndUpdate(
         { _id: id, userId: user.id },
         { comment },
@@ -204,8 +209,9 @@ const deleteComment = {
   args: {
     id: { type: GraphQLID }
   },
-  resolve: async (_, { id }) => {
+  resolve: async (_, { id }, { user }) => {
     try {
+      if (!user || !user.role.includes("admin")) return null;
       const comment = await Comment.findById({ _id: id });
 
       if (comment) {
