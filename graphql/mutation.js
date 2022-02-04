@@ -1,3 +1,4 @@
+const { AuthenticationError, ApolloError } = require("apollo-server");
 const { GraphQLString, GraphQLID } = require("graphql");
 const { User, Post } = require("../models");
 const { auth } = require("../utils");
@@ -13,25 +14,32 @@ const register = {
     password: { type: GraphQLString }
   },
   async resolve(_, { username, email, password, role }) {
-    const userExists = await User.findOne({ email: email });
-    if (userExists) {
-      throw new Error("user email already exists");
+    try {
+      const userExists = await User.findOne({ email: email });
+      if (userExists) {
+        throw new Error("user email already exists");
+      }
+      const saveUser = new User({
+        username,
+        email,
+        password,
+        role
+      });
+      const user = await saveUser.save();
+      const payload = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      };
+      const token = auth.createJWTToken(payload);
+      return token;
+    } catch (error) {
+      throw new AuthenticationError("Something went wrong", "BAD_INPUT", {
+        status: 400,
+        error: true
+      });
     }
-    const saveUser = new User({
-      username,
-      email,
-      password,
-      role
-    });
-    const user = await saveUser.save();
-    const payload = {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role
-    };
-    const token = auth.createJWTToken(payload);
-    return token;
   }
 };
 
@@ -64,7 +72,10 @@ const login = {
       const token = auth.createJWTToken(payload);
       return token;
     } catch (error) {
-      throw error;
+      throw new AuthenticationError("Something went wrong", "BAD_INPUT", {
+        status: 400,
+        error: true
+      });
     }
   }
 };
@@ -86,7 +97,10 @@ const createPost = {
       const post = await newPost.save();
       return post;
     } catch (error) {
-      throw error;
+      throw new ApolloError("Something went wrong", "BAD_INPUT", {
+        status: 400,
+        error: true
+      });
     }
   }
 };
@@ -108,9 +122,33 @@ const updatePost = {
       );
       return updatedPost;
     } catch (error) {
+      throw new ApolloError("Something went wrong", "BAD_INPUT", {
+        status: 400,
+        error: true
+      });
+    }
+  }
+};
+
+const deletePost = {
+  type: postType,
+  description: "delete by Id a Post",
+  args: {
+    id: { type: GraphQLID }
+  },
+  resolve: async (_, { id }, { user }) => {
+    try {
+      const post = await Post.findById({ _id: id });
+      if (post) {
+        await post.remove();
+        return post;
+      } else {
+        throw new Error("post id not found");
+      }
+    } catch (error) {
       throw error;
     }
   }
 };
 
-module.exports = { register, login, createPost, updatePost };
+module.exports = { register, login, createPost, updatePost, deletePost };
