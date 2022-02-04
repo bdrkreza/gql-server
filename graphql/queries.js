@@ -1,6 +1,6 @@
-const { GraphQLList, GraphQLID } = require("graphql");
-const { User, Post } = require("../models");
-const { userType, postType } = require("./types");
+const { GraphQLList, GraphQLID, GraphQLNonNull } = require("graphql");
+const { User, Post, Comment } = require("../models");
+const { userType, postType, commentType } = require("./types");
 
 const getAlluser = {
   type: new GraphQLList(userType),
@@ -32,4 +32,26 @@ const getPostById = {
   resolve: async (_, { id }) => await Post.find({ _id: id })
 };
 
-module.exports = { getAlluser, getUser, getAllPost, getPostById };
+const getAllComments = {
+  type: new GraphQLList(commentType),
+  description: "Retrieves list of commnets",
+  resolve: async () => await Comment.find()
+};
+
+const getBycomment = {
+  type: commentType,
+  description: "Retrieves a single comment",
+  args: {
+    id: { type: new GraphQLNonNull(GraphQLID) }
+  },
+  resolve: async (_, { id }) => await Comment.findById({ _id: id })
+};
+
+module.exports = {
+  getAlluser,
+  getUser,
+  getAllPost,
+  getPostById,
+  getAllComments,
+  getBycomment
+};

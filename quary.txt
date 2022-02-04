@@ -75,3 +75,82 @@ query{
     }
   }
 }
+
+.......deletePost..........
+mutation{
+  deletePost(id:"61fd330a5a8c152bc6e6e4b5"){
+    title
+    _id
+    authorId
+    body
+  }
+}
+
+.........addComment.......
+mutation{
+  addComment(comment:"this is best apple",postId:"61fd327d232fae309f0c3e98"){
+    comment
+    user{
+      username
+      email
+    }
+    post{
+      authorId
+      title
+      body
+  
+    }
+  }
+}
+
+.......... updateComment..........
+mutation{
+  updateComment(id:"61fd5ba28e54b6da2762b72b",comment:"this is american food"){
+comment
+    user{
+      username
+      email
+    }
+    post{
+      title
+    }
+  }
+}
+
+..........deleteComment............
+mutation{
+  deleteComment(id:"61fd5ba28e54b6da2762b72b"){
+    comment
+  }
+}
+
+.....getAllComments.............
+query{
+  getAllComments{
+_id
+    comment
+    user{
+      username
+    }
+    post{
+      body
+    }
+  }
+}
+ 
+ ...........getBycomment...........
+query{
+  getBycomment(id:"61fd5b338e54b6da2762b729"){
+    _id
+    comment
+    user{
+      username
+      email
+    }
+    post{
+      title
+      body
+    }
+  }
+  
+}

@@ -1,8 +1,8 @@
 const { AuthenticationError, ApolloError } = require("apollo-server");
 const { GraphQLString, GraphQLID } = require("graphql");
-const { User, Post } = require("../models");
+const { User, Post, Comment } = require("../models");
 const { auth } = require("../utils");
-const { postType } = require("./types");
+const { postType, commentType } = require("./types");
 
 const register = {
   type: GraphQLString,
@@ -120,6 +120,7 @@ const updatePost = {
         { title, body },
         { new: true, runValidators: true }
       );
+      if (!updatedPost) throw new Error("No post with the given ID");
       return updatedPost;
     } catch (error) {
       throw new ApolloError("Something went wrong", "BAD_INPUT", {
@@ -139,6 +140,7 @@ const deletePost = {
   resolve: async (_, { id }, { user }) => {
     try {
       const post = await Post.findById({ _id: id });
+
       if (post) {
         await post.remove();
         return post;
@@ -151,4 +153,80 @@ const deletePost = {
   }
 };
 
-module.exports = { register, login, createPost, updatePost, deletePost };
+const addComment = {
+  type: commentType,
+  description: "Create a new Comment",
+  args: {
+    comment: { type: GraphQLString },
+    postId: { type: GraphQLID }
+  },
+  resolve: async (_, { postId, comment }, { user }) => {
+    try {
+      const newComment = new Comment({
+        postId,
+        comment,
+        userId: user.id
+      });
+      return await newComment.save();
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+
+const updateComment = {
+  type: commentType,
+  description: "update a Comment",
+  args: {
+    id: { type: GraphQLID },
+    comment: { type: GraphQLString }
+  },
+  resolve: async (_, { id, comment }, { user }) => {
+    try {
+      const updatedComment = await Comment.findByIdAndUpdate(
+        { _id: id, userId: user.id },
+        { comment },
+        { new: true, runValidators: true }
+      );
+      if (!updatedComment) throw new Error("No comment with the given ID");
+      return updatedComment;
+    } catch (error) {
+      throw new ApolloError("Something went wrong", "BAD_INPUT", {
+        status: 400,
+        error: true
+      });
+    }
+  }
+};
+const deleteComment = {
+  type: commentType,
+  description: "delete by Id a comment",
+  args: {
+    id: { type: GraphQLID }
+  },
+  resolve: async (_, { id }) => {
+    try {
+      const comment = await Comment.findById({ _id: id });
+
+      if (comment) {
+        await comment.remove();
+        return comment;
+      } else {
+        throw new Error("comment id not found");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  createPost,
+  updatePost,
+  deletePost,
+  addComment,
+  updateComment,
+  deleteComment
+};

@@ -1,5 +1,5 @@
 const { GraphQLObjectType, GraphQLString, GraphQLID } = require("graphql");
-const { User } = require("../models");
+const { User, Post } = require("../models");
 
 const userType = new GraphQLObjectType({
   name: "userType",
@@ -32,7 +32,29 @@ const postType = new GraphQLObjectType({
   }
 });
 
+const commentType = new GraphQLObjectType({
+  name: "commentType",
+  description: "the create comment type",
+  fields: {
+    _id: { type: GraphQLID },
+    comment: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
+    user: {
+      type: userType,
+      resolve: async (parent) => {
+        return await User.findById(parent.userId);
+      }
+    },
+    post: {
+      type: postType,
+      resolve: async (parent) => {
+        return await Post.findById(parent.postId);
+      }
+    }
+  }
+});
 module.exports = {
   userType,
-  postType
+  postType,
+  commentType
 };

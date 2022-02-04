@@ -5,9 +5,19 @@ const {
   login,
   createPost,
   updatePost,
-  deletePost
+  deletePost,
+  addComment,
+  updateComment,
+  deleteComment
 } = require("./mutation");
-const { getAlluser, getUser, getAllPost, getPostById } = require("./queries");
+const {
+  getAlluser,
+  getUser,
+  getAllPost,
+  getPostById,
+  getAllComments,
+  getBycomment
+} = require("./queries");
 
 const QueryType = new GraphQLObjectType({
   name: "QueryType",
@@ -16,7 +26,9 @@ const QueryType = new GraphQLObjectType({
     getAlluser,
     getUser,
     getAllPost,
-    getPostById
+    getPostById,
+    getAllComments,
+    getBycomment
   }
 });
 
@@ -28,7 +40,10 @@ const MutationType = new GraphQLObjectType({
     login,
     createPost,
     updatePost,
-    deletePost
+    deletePost,
+    addComment,
+    updateComment,
+    deleteComment
   }
 });
 
