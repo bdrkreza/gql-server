@@ -1,6 +1,7 @@
 const { GraphQLString } = require("graphql");
-const { User } = require("../models");
+const { User, Post } = require("../models");
 const { auth } = require("../utils");
+const { postType } = require("./types");
 
 const register = {
   type: GraphQLString,
@@ -36,6 +37,7 @@ const register = {
 
 const login = {
   type: GraphQLString,
+  description: "login user and return token",
   args: {
     email: { type: GraphQLString },
     password: { type: GraphQLString }
@@ -43,12 +45,13 @@ const login = {
   async resolve(_, { email, password }) {
     try {
       const user = await User.findOne({ email: email }).select("+password");
-      console.log(user);
       if (!user) return null;
+
       const isValidPassword = await user.isValidPassword(
         password,
         user.password
       );
+
       if (!isValidPassword) {
         throw new Error("Incorrect email or password!");
       }
@@ -66,4 +69,26 @@ const login = {
   }
 };
 
-module.exports = { register, login };
+const createPost = {
+  type: postType,
+  description: "Create a new Post",
+  args: {
+    title: { type: GraphQLString },
+    body: { type: GraphQLString }
+  },
+  resolve: async (_, { title, body }, { user }) => {
+    try {
+      const newPost = new Post({
+        title,
+        body,
+        authorId: user.id
+      });
+      const post = await newPost.save();
+      return post;
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+
+module.exports = { register, login, createPost };

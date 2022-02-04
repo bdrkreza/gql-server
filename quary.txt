@@ -1,0 +1,77 @@
+
+......get all user.......
+query{
+  users{
+    id
+    username
+    email
+    role
+    password
+    createdAt
+  }
+}
+
+......user only......
+query{
+  user(id:"61fcf197c2f838a9d61d51d3") {
+    id
+    username
+    email
+    role
+    createdAt
+  }
+}
+
+.......Login user.........
+mutation{
+  login(email:"reza@gmail.com",password:"123456")
+}
+
+......create user......
+mutation{
+  register(username:"rkreza",email:"rkreza@gmail.com",password:"123456",role:"admin")
+}
+
+......create post......
+mutation{
+  createPost(title:"this",body:"this is awsum"){
+    title
+    body
+    authorId
+    createdAt
+    author{
+      username
+      email
+    }
+  }
+}
+
+.........getAllPost.......
+query{
+  getAllPost{
+    id
+    authorId
+    title
+    body
+    createdAt
+    author{
+      id
+      username
+      email
+      role
+    }
+  }
+}
+.........getPostById.......
+query{
+  getPostById(id:"61fd31e2c2b5aa9c6be74ebc"){
+    authorId
+    title
+    body
+    createdAt
+    author{
+      username
+      email
+    }
+  }
+}

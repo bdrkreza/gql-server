@@ -2,10 +2,13 @@ const express = require("express");
 const { graphqlHTTP } = require("express-graphql");
 const connectDB = require("./db");
 const schema = require("./graphql/schema");
+const authenticate = require("./middleware/auth");
 const app = express();
 require("dotenv").config();
 
 connectDB();
+
+app.use(authenticate);
 app.get("/", (req, res) => {
   res.send("welcome to my graphql api");
 });
